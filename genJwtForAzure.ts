@@ -5,7 +5,7 @@ import * as fs from 'fs';
 require('dotenv').config()
 
 const JWT_AUDIENCE = 'https://login.microsoftonline.com/181724eb-b03a-43fe-806b-da9aa21606b4/v2.0'
-const DEFAULT_ALGORITHM = 'RS512';
+const DEFAULT_ALGORITHM = 'RS256';
 const PRIVATE_KEY = fs.readFileSync(process.env.PRIVATE_KEY_PATH, { encoding: 'utf-8' });
 
 interface JWTPayload {
@@ -30,7 +30,7 @@ async function generateToken(
     aud: JWT_AUDIENCE
   };
   const token = await new Promise((resolve, reject) => {
-    jwt.sign(payload, secretKey, { algorithm }, (err, encoded) => {
+    jwt.sign(payload, secretKey, { algorithm, header: { x5t: process.env.CERT_THUMBPRINT } }, (err, encoded) => {
       if (!err) {
         resolve(encoded || '');
       } else {
@@ -42,4 +42,4 @@ async function generateToken(
   return token;
 }
 
-generateToken(process.argv[2] as string)
+generateToken(process.env.CLIENT_ID)
