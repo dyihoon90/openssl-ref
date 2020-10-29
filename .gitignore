@@ -2,3 +2,5 @@
 .env
 *.pem
 node_modules
+!exampleCert.pem
+!exampleKey.pem
