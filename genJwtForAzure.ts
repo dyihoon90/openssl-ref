@@ -4,9 +4,7 @@ import * as jwt from 'jsonwebtoken';
 import * as fs from 'fs';
 require('dotenv').config()
 
-const JWT_AUDIENCE = 'https://login.microsoftonline.com/181724eb-b03a-43fe-806b-da9aa21606b4/v2.0'
 const DEFAULT_ALGORITHM = 'RS256';
-const PRIVATE_KEY = fs.readFileSync(process.env.PRIVATE_KEY_PATH, { encoding: 'utf-8' });
 
 interface JWTPayload {
   sub: string;
@@ -17,17 +15,27 @@ interface JWTPayload {
   [key: string]: unknown;
 }
 
-async function generateToken(
+/**
+ *
+ * @param clientApplicationId The client application ID from Azure AD. Passed to client during onboarding
+ * @param algorithm The algo of this key. defaults to RS256
+ * @param secretKey the private key. See exampleKey.pem for reference
+ * @param audience The audience of this JWT.
+ * @example 'https://login.microsoftonline.com/181724eb-b03a-43fe-806b-da9aa21606b4/v2.0'
+ */
+export async function generateToken(
   clientApplicationId: string,
+  secretKey: string,
+  audience: string,
   algorithm: jwt.Algorithm = DEFAULT_ALGORITHM,
-  secretKey: string = PRIVATE_KEY): Promise<string> {
+): Promise<string> {
   const payload: JWTPayload = {
     jti: v4(),
     iss: clientApplicationId,
     sub: clientApplicationId,
     nbf: moment().unix(),
     exp: moment().add(5, 'minutes').unix(),
-    aud: JWT_AUDIENCE
+    aud: audience
   };
   const token = await new Promise((resolve, reject) => {
     jwt.sign(payload, secretKey, { algorithm, header: { x5t: process.env.CERT_THUMBPRINT } }, (err, encoded) => {
@@ -38,8 +46,5 @@ async function generateToken(
       }
     });
   }) as string;
-  console.log(token)
   return token;
 }
-
-generateToken(process.env.CLIENT_ID)

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest -i",
     "gen-jwt": "ts-node genJwtForAzure.ts",
     "gen-cert-thumbprint": "sh ./scripts/gen-cert-thumbprint.sh"
   },
@@ -25,8 +25,11 @@
     "uuid": "^8.3.1"
   },
   "devDependencies": {
+    "@types/jest": "^26.0.15",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node": "^14.14.6",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.4.3",
     "typescript": "^4.0.5"
   }
 }
